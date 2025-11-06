@@ -1,0 +1,42 @@
+python -m provided_code.plotting <case_name> [OPTIONS]
+	<case_name> = name of the case (directory in outputs/), e.g. input_example.
+		
+	[OPTIONS] =
+		--what :
+			+ mesh 									(default) undeformed mesh
+			+ displ 								displacement field
+			+ strain 								strain field
+			+ stress 								stress field
+				
+		--component :
+			+ ux, uy, uz, mag 						(default) Displacement
+			+ exx, eyy, ezz, gyz, gxz, gxy			Strain
+			+ vm, sxx, syy, szz, tyz, txz, txy		Stress
+				
+		--scale <float>								Deformation scale factor (applied to displacements)
+				
+		--no-show								    Do not open an interactive window (useful for saving)
+				
+		--save <path>								Save figure as PNG to given path.
+
+
+You can also call the plotting functions directly from a script or Jupyter notebook:
+
+from provided_code.plotting import (
+	plot_mesh, plot_displacement, plot_strain, plot_stress
+)
+# Plot undeformed mesh
+plot_mesh("input_example")
+# Plot deformed displacement magnitude (scale factor = 10)
+plot_displacement("input_example", component="mag", scale=10)
+# Plot strain component exx
+plot_strain("input_example", component="exx", scale=5)
+# Plot von Mises stress
+plot_stress("input_example", component="vm", scale=3)
+
+
+Notes
+• The plotting functions automatically load:
+– Input mesh from outputs/<case>/<case>.py
+– Results from outputs/<case>/<case>_results.npz
+• Displacement, strain, and stress plots require a completed solver run that generated <case>_results.npz.
