@@ -29,9 +29,11 @@ def tetra4_coord_transform(nodee: np.ndarray) -> np.ndarray:
               z1  z2  z3  z4 ]
     """
 
-    C_t = np.vstack((np.ones(4),nodee.T))
+    Ct = np.zeros((4,4))
+    Ct[0,:] = 1
+    Ct[1:4,:] = nodee.T
 
-    return C_t
+    return Ct
 
 def tetra4_volume(nodee: np.ndarray) -> float:
     """
@@ -49,7 +51,8 @@ def tetra4_volume(nodee: np.ndarray) -> float:
     """
 
     Ct = tetra4_coord_transform(nodee)
-    Ve = np.linalg.det(Ct) / 6.0
+    Ve = np.linalg.det(Ct)/6
+
     return Ve
 
 
@@ -68,33 +71,70 @@ def tetra4_B(nodee: np.ndarray) -> np.ndarray:
         Strain–displacement matrix such that strain = B @ u_e.
     """
 
-    Ct = tetra4_coord_transform(nodee)
-    if np.isclose(np.linalg.det(Ct), 0):
-        raise np.linalg.LinAlgError("Element with zero or negative volume")
+    B = np.zeros((6,12))
+    Ve = tetra4_volume(nodee)
 
-    Ct_inv = np.linalg.inv(Ct)
+    x = nodee[:,0]
+    y = nodee[:,1]
+    z = nodee[:,2]
 
-    B = np.zeros((6, 12))
+    a1 = (y[3]-y[1])*(z[2]-z[1]) - (y[2]-y[1])*(z[3]-z[1])
+    b1 = (x[2]-x[1])*(z[3]-z[1]) - (x[3]-x[1])*(z[2]-z[1])
+    c1 = (x[3]-x[1])*(y[2]-y[1]) - (x[2]-x[1])*(y[3]-y[1])
 
-    for i in range(4):
-        col = i * 3
+    a2 = (y[2]-y[0])*(z[3]-z[2]) - (y[3]-y[2])*(z[2]-z[0])
+    b2 = (x[3]-x[2])*(z[2]-z[0]) - (x[2]-x[0])*(z[3]-z[2])
+    c2 = (x[2]-x[0])*(y[3]-y[2]) - (x[3]-x[2])*(y[2]-y[0])
 
-        dxi_dx = Ct_inv[i, 1]
-        dxi_dy = Ct_inv[i, 2]
-        dxi_dz = Ct_inv[i, 3]
+    a3 = (y[3]-y[0])*(z[1]-z[3]) - (y[1]-y[3])*(z[3]-z[0])
+    b3 = (x[1]-x[3])*(z[3]-z[0]) - (x[3]-x[0])*(z[1]-z[3])
+    c3 = (x[3]-x[0])*(y[1]-y[3]) - (x[1]-x[3])*(y[3]-y[0])
 
-        B[0, col] = dxi_dx
-        B[1, col + 1] = dxi_dy
-        B[2, col + 2] = dxi_dz
+    a4 = (y[1]-y[0])*(z[2]-z[1]) - (y[2]-y[1])*(z[1]-z[0])
+    b4 = (x[2]-x[1])*(z[1]-z[0]) - (x[1]-x[0])*(z[2]-z[1])
+    c4 = (x[1]-x[0])*(y[2]-y[1]) - (x[2]-x[1])*(y[1]-y[0])
 
-        B[3, col] = dxi_dy
-        B[3, col + 1] = dxi_dx
+    B[0,0] = a1
+    B[1,1] = b1
+    B[2,2] = c1
+    B[3,0] = b1
+    B[3,1] = a1
+    B[4,1] = c1
+    B[4,2] = b1
+    B[5,0] = c1
+    B[5,2] = a1
 
-        B[4, col + 1] = dxi_dz
-        B[4, col + 2] = dxi_dy
+    B[0,3] = a2
+    B[1,4] = b2
+    B[2,5] = c2
+    B[3,3] = b2
+    B[3,4] = a2
+    B[4,4] = c2
+    B[4,5] = b2
+    B[5,3] = c2
+    B[5,5] = a2
 
-        B[5, col] = dxi_dz
-        B[5, col + 2] = dxi_dx
+    B[0,6] = a3
+    B[1,7] = b3
+    B[2,8] = c3
+    B[3,6] = b3
+    B[3,7] = a3
+    B[4,7] = c3
+    B[4,8] = b3
+    B[5,6] = c3
+    B[5,8] = a3
+
+    B[0,9]  = a4
+    B[1,10] = b4
+    B[2,11] = c4
+    B[3,9]  = b4
+    B[3,10] = a4
+    B[4,10] = c4
+    B[4,11] = b4
+    B[5,9]  = c4
+    B[5,11] = a4
+
+    B = B/(6*Ve)
 
     return B
 
@@ -117,24 +157,24 @@ def hooke_iso_3d(E: float, v: float) -> np.ndarray:
 
     H = np.zeros((6, 6))
 
-    C1 = E * (1 - v) / ((1 + v) * (1 - 2 * v))
-    C2 = E * v / ((1 + v) * (1 - 2 * v))
-    C3 = E / (2 * (1 + v))
+    C1 = E*(1-v) / ((1+v)*(1-2*v))
+    C2 = E*v / ((1+v)*(1-2*v))
+    C3 = E / (2*(1+v))
 
-    H[0, 0] = C1
-    H[1, 1] = C1
-    H[2, 2] = C1
+    H[0,0] = C1
+    H[1,1] = C1
+    H[2,2] = C1
 
-    H[0, 1] = C2
-    H[0, 2] = C2
-    H[1, 0] = C2
-    H[1, 2] = C2
-    H[2, 0] = C2
-    H[2, 1] = C2
+    H[0,1] = C2
+    H[0,2] = C2
+    H[1,0] = C2
+    H[1,2] = C2
+    H[2,0] = C2
+    H[2,1] = C2
 
-    H[3, 3] = C3
-    H[4, 4] = C3
-    H[5, 5] = C3
+    H[3,3] = C3
+    H[4,4] = C3
+    H[5,5] = C3
 
     return H
 
@@ -166,7 +206,7 @@ def tetra4_K(nodee: np.ndarray, matere: np.ndarray) -> np.ndarray:
     B = tetra4_B(nodee)
     Ve = tetra4_volume(nodee)
 
-    Ke = B.T @ H @ B * Ve
+    Ke = B.T @ H @ B*Ve
     return Ke
 
 
@@ -200,7 +240,7 @@ def tetra4_strain_stress(nodee: np.ndarray,
     E = matere[0]
     v = matere[1]
 
-    H = hooke_iso_3d(E, v)
+    H = hooke_iso_3d(E,v)
     B = tetra4_B(nodee)
 
     strain = B @ ue
