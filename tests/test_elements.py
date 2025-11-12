@@ -42,5 +42,5 @@ for i in range(9):
     print(f"Test {i+1}:")
     print(f"  > {strain}")
     print(f"  > {good_answer}")
-    if np.allclose(strain,good_answer): print(f"    > Correct !!!!!")
+    if np.allclose(strain,good_answer): print(f"    > OK")
     else:print(f"    > ERROR !!!!!")
