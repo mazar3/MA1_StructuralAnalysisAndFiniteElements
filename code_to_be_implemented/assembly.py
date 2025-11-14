@@ -29,16 +29,19 @@ def assembly(node: np.ndarray,
         conversion to 0-based is handled internally.
       - Currently implemented element type: 'tetra4'.
     """
+    # get the number of elements in the structure:
+    nelem = elem.shape[0]
 
-    # TODO: Number of elements in the structure
-    nelem = 
+    # get the number of degrees of freedom of the structure:
+    ndof  = node.shape[0]*3 #because there are 3ndof per node (x,y,z)
 
-    # TODO: Total number of degrees of freedom of the structure
-    ndof  = 
+    # get the number of nodes:
+    nnode = node.shape[0]
 
-    # TODO: Initialize Ksys full of zeros
-    # For efficient storage, one should use a sparse matrix from scipy.sparse instead of NumPy (not necessary in this project)
-    Ksys = 
+    # get the position of the dof in the unknowns
+    dofpos = compute_dofpos(nnode)
+
+    Ksys = np.zeros((ndof,ndof)) # For efficient storage, one should use a sparse matrix from scipy.sparse instead of NumPy (not necessary in this project)
 
     for e in range(nelem):
         type_id = int(elem[e, 0])
@@ -51,13 +54,36 @@ def assembly(node: np.ndarray,
 
         match eltpe:
             case ElementType.TETRA4:
-                # You will need dofpos = compute_dofpos(nnode)
+                # get the properties of the element
+                e_type = elem[e,1]-1
+                e_material = mater[e_type,:]
 
-                # TODO: Determine the position of the dof in the unknowns
+                # get the 4 nodes of the element e and their position
+                node_ids = elem[e,2:6]-1
+                node_pos = node[node_ids,:]
 
-                # TODO: Add element contribution to the structural stiffness matrix
+                # get the stiffness matrix (12x12) of the element
+                Ke = tetra4_K(node_pos, e_material)
 
-                # !!! Python is a 0-based language !!!
+                # Add element contribution to the structural stiffness matrix
+                for row in range(12):
+                    # get the local node (0,1,2 or 3) and the direction (0,1 or 2)
+                    n_local_row = row // 3
+                    dir_row = row % 3
+                    # get the global node
+                    n_global_row = node_ids[n_local_row]
+                    # get the global row index in Ksys
+                    j = dofpos[n_global_row, dir_row]
+
+                    for col in range(12):
+                        # same thing but for the columns
+                        n_local_col = col // 3
+                        dir_col = col % 3
+                        n_global_col = node_ids[n_local_col]
+                        i = dofpos[n_global_col, dir_col]
+
+                        # add the contribution of the element e to Ksys
+                        Ksys[j, i] = Ksys[j, i] + Ke[row, col]
             case _:
                 raise NotImplementedError(f"Element type '{eltp[type_id]}' not implemented.")
 
