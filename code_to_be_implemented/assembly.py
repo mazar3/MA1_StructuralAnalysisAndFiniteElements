@@ -55,11 +55,11 @@ def assembly(node: np.ndarray,
         match eltpe:
             case ElementType.TETRA4:
                 # get the properties of the element
-                e_type = elem[e,1]-1
+                e_type = elem[e,1] - 1 # 0-based index
                 e_material = mater[e_type,:]
 
                 # get the 4 nodes of the element e and their position
-                node_ids = elem[e,2:6]-1
+                node_ids = elem[e,2:6] - 1 # 0-based index
                 node_pos = node[node_ids,:]
 
                 # get the stiffness matrix (12x12) of the element

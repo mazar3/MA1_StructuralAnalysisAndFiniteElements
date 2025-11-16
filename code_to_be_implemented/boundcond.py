@@ -38,7 +38,7 @@ def boundcond(pdof: np.ndarray,
     # TODO: Total number of degrees of freedom of the system
     ndof = 
 
-    # Build dofpos: shape (nnode, 3)
+    # build dofpos
     dofpos = compute_dofpos(nnode)
 
     # TODO: Number of nodal degrees of freedom
