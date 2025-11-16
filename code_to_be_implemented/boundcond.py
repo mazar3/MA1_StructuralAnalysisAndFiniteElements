@@ -48,27 +48,36 @@ def boundcond(pdof: np.ndarray,
     Fcl = Fext.copy()
     Kcl = Ksys.copy()
 
-    if method < 0: # Direct method
-        # loop over each prescribed degree of freedom
+    if method < 0:  # DIRECT METHOD
+        # STEP 1 (cf slides): Group known terms on RHS
         for i in range(pdof.shape[0]):
             # get node number, direction and value
-            node_num = int(pdof[i,0]) - 1 # 0-based index
-            node_dir = int(pdof[i,1]) - 1 # 0-based index
+            node_num = int(pdof[i,0]) - 1  # 0-based index
+            node_dir = int(pdof[i,1]) - 1  # 0-based index
             node_val = pdof[i,2]
 
             # get the global dof position in the matrix
             node_pos = dofpos[node_num,node_dir]
 
-            # step 1 (cf slides): group known terms on RHS
+            # group known terms on RHS
             Fcl = Fcl - Ksys[:,node_pos] * node_val
 
-            # step 2: "remove" equation by modifying Kcl and Fcl
+        # STEP 2 (cf slides): "Remove" equation corresponding to the known quantity
+        for i in range(pdof.shape[0]):
+            # get node number, direction and value
+            node_num = int(pdof[i,0]) - 1  # 0-based index
+            node_dir = int(pdof[i,1]) - 1  # 0-based index
+            node_val = pdof[i,2]
+
+            # get the global dof position in the matrix
+            node_pos = dofpos[node_num, node_dir]
+
             # edit Kcl (put 0s to the row and column)
             Kcl[node_pos,:] = 0
             Kcl[:,node_pos] = 0
             # put 1 to the diagonal element of Kcl
             Kcl[node_pos,node_pos] = 1
-            # put the value tu the element of Fcl
+            # put the value to the element of Fcl
             Fcl[node_pos] = node_val
 
     else: # Penalty method
