@@ -120,7 +120,7 @@ for i in range(3):
 mater_nu0 = np.array([1000.0, 0.0])
 u_exx = np.zeros(12)
 for n in range(4):
-    u_exx[3*n] = node_single[n, 0]
+    u_exx[3*n] = node_single[n,0]
 
 strain_nu0, stress_nu0 = tetra4_strain_stress(node_single, mater_nu0, u_exx)
 if np.isclose(stress_nu0[1], 0.0) and np.isclose(stress_nu0[2], 0.0):
@@ -139,9 +139,9 @@ for i in range(6):
 
     u_global = np.zeros(ndof_cube)
     for n in range(input_cube.node.shape[0]):
-        x = input_cube.node[n, 0]
-        y = input_cube.node[n, 1]
-        z = input_cube.node[n, 2]
+        x = input_cube.node[n,0]
+        y = input_cube.node[n,1]
+        z = input_cube.node[n,2]
 
         if i == 0:                  # exx
             u_global[3*n] = x
@@ -208,9 +208,9 @@ for i in range(3):
     axis = axes[i]
     u_rigid = np.zeros(ndof_cube)
     for n in range(input_cube.node.shape[0]):
-        x = input_cube.node[n, 0]
-        y = input_cube.node[n, 1]
-        z = input_cube.node[n, 2]
+        x = input_cube.node[n,0]
+        y = input_cube.node[n,1]
+        z = input_cube.node[n,2]
 
         if i == 0:                  # Rot X
             u_rigid[3*n+1] = -z
@@ -232,8 +232,8 @@ for i in range(3):
     print(f"MULTI ELEMENT - Rigid body (Rot {axis}) ; EXPECTED : 0.0, max_force={max_f:.3f} -> {res}")
 
 # 2.4. Penalty
-fixed_nodes = [0, 1, 3, 4]
-loaded_nodes = [2, 5, 6, 7]
+fixed_nodes = [0,1,3,4]
+loaded_nodes = [2,5,6,7]
 load_val = 10.0
 
 K_base = Ksys_cube.copy()
