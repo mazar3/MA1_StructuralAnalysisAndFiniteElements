@@ -73,19 +73,18 @@ def assembly(node: np.ndarray,
                     # get the global node
                     n_global_row = node_ids[n_local_row]
                     # get the global row index in Ksys
-                    j = dofpos[n_global_row, dir_row]
+                    new_row = dofpos[n_global_row, dir_row]
 
                     for col in range(12):
                         # same thing but for the columns
                         n_local_col = col // 3
                         dir_col = col % 3
                         n_global_col = node_ids[n_local_col]
-                        i = dofpos[n_global_col, dir_col]
+                        new_col = dofpos[n_global_col, dir_col]
 
                         # add the contribution of the element e to Ksys
-                        Ksys[j, i] = Ksys[j, i] + Ke[row, col]
+                        Ksys[new_row, new_col] = Ksys[new_row, new_col] + Ke[row, col]
             case _:
                 raise NotImplementedError(f"Element type '{eltp[type_id]}' not implemented.")
-
 
     return Ksys
