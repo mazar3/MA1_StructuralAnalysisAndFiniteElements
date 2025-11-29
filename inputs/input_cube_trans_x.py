@@ -1,16 +1,16 @@
-# input_cube.py
+# input_cube_trans_x.py
 import numpy as np
 
 # nodal coordinates [x, y, z]
 node = np.array([
-    [0, 0, 0],
-    [1, 0, 0],
-    [1, 1, 0],
-    [0, 1, 0],
-    [0, 0, 1],
-    [1, 0, 1],
-    [1, 1, 1],
-    [0, 1, 1],
+    [0.0, 0.0, 0.0],
+    [1.0, 0.0, 0.0],
+    [1.0, 1.0, 0.0],
+    [0.0, 1.0, 0.0],
+    [0.0, 0.0, 1.0],
+    [1.0, 0.0, 1.0],
+    [1.0, 1.0, 1.0],
+    [0.0, 1.0, 1.0],
 ], dtype=float)
 
 # mesh connectivity [type#, material#, node1 node2 node3 node4]
@@ -24,36 +24,34 @@ elem = np.array([
 
 # prescribed degrees of freedom (displacements) [node# dir value]
 pdof = np.array([
-    [1, 1, 0.0],
+    [1, 1, 1.0],
     [1, 2, 0.0],
     [1, 3, 0.0],
-    [2, 1, 0.0],
+    [2, 1, 1.0],
     [2, 2, 0.0],
     [2, 3, 0.0],
-    [3, 1, 0.0],
+    [3, 1, 1.0],
     [3, 2, 0.0],
     [3, 3, 0.0],
-    [4, 1, 0.0],
+    [4, 1, 1.0],
     [4, 2, 0.0],
     [4, 3, 0.0],
-    [5, 1, 0.0],
+    [5, 1, 1.0],
     [5, 2, 0.0],
     [5, 3, 0.0],
-    [6, 1, 0.0],
+    [6, 1, 1.0],
     [6, 2, 0.0],
     [6, 3, 0.0],
-    [7, 1, 0.0],
+    [7, 1, 1.0],
     [7, 2, 0.0],
     [7, 3, 0.0],
-    [8, 1, 0.0],
+    [8, 1, 1.0],
     [8, 2, 0.0],
     [8, 3, 0.0],
 ], dtype=float)
 
 # applied nodal loads [node# dir value]
-nodf = np.array([
-    [7, 3, 1.0],
-], dtype=float)
+nodf = np.array([], dtype=float)
 
 # finite element type table
 eltp = {1: "tetra4"}
@@ -66,7 +64,6 @@ nu = 0.3
 mater = np.array([
     [E, nu],
 ], dtype=float)
-
 
 # Boundary condition method
 # < 0 direct, >= 0 penalty
