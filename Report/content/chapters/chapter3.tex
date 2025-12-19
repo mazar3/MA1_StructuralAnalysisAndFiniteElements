@@ -1,0 +1,17 @@
+\section{Discussion}
+\label{chap:discussion}
+
+\subsection{Element performance and shear locking}
+Throughout this study, we utilized linear tetrahedral elements (TETRA4). It is well known in finite element theory \cite{tetra4_theory} that linear tetrahedra can exhibit "volumetric locking" or "shear locking," particularly in bending-dominated problems. This results in an artificially stiff response.
+
+This behavior explains why our coarse meshes consistently overestimated the stiffness (or underestimated the displacement) for the springs. As the mesh was refined, the stiffness values decreased, converging towards a softer solution. For the front spring, the converged value (7.73 kN/m) remained slightly above the experimental value (7.2 kN/m), consistent with the stiff nature of TETRA4 elements.
+
+\subsection{The "better" coarse mesh anomaly}
+In the rear spring analysis, the "Fine" mesh seemingly produced a "better" result ($k \approx 85.16$ kN/m) than the "Very Fine" mesh ($k \approx 78.14$ kN/m), when compared to the experimental reference ($k_{exp} = 85.3$ kN/m).
+
+The "Very Fine" mesh is numerically superior and provides a result closer to the exact solution of the \textit{mathematical model}. The fact that it drifts further from the \textit{experimental} value indicates that the mathematical model itself (geometry, boundary conditions, material properties) has discrepancies with physical reality. The "Fine" mesh result was merely a coincidence where discretization error cancelled out modeling error. We must trust the converged solution (78.14 kN/m) as the true prediction of our model, even if it is less accurate experimentally.
+
+\subsection{Model limitations and improvements}
+Several factors contribute to the discrepancy between our converged FEM results and experimental data. First, the use of linear tetrahedral elements introduces artificial stiffening, which could be mitigated by switching to quadratic tetrahedra (TETRA10) or hexahedral elements to improve accuracy for the same mesh density. Second, our boundary conditions assume a "flat plate" compression with fixed radial degrees of freedom ($u_x=u_y=0$), whereas in reality, the spring ends can slip or expand slightly, reducing the effective stiffness. Finally, the geometric simplification of modeling only a few coils ignores the complex contact mechanics at the spring ends (closed and ground ends), which significantly affects the number of active coils.
+
+To address these limitations and improve the model fidelity, future work should prioritize employing high-order elements to eliminate shear locking. Additionally, modeling the full spring geometry, including ground ends and transition coils, would allow us to capture realistic boundary effects. Instead of relying on generic specifications, a 3D scan of the actual test specimens would also provide a direct validation of the geometric model.

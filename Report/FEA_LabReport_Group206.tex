@@ -1,0 +1,407 @@
+% ╔═══════════════════════════════════════════════════════════════════════════╗
+% ║                     UNIVERSAL ACADEMIC REPORT TEMPLATE                    ║
+% ║                           BRUFACE • ULB • UMONS                           ║
+% ╚═══════════════════════════════════════════════════════════════════════════╝
+%
+% Author: Maximilien Zarioh (2025)
+% ═════════════════════════════════════════════════════════════════════════════
+%                              SCHOOL SELECTION
+% ═════════════════════════════════════════════════════════════════════════════
+
+\newcommand{\school}{BRUFACE}  % <<< BRUFACE or ULB or UMONS
+
+% ═════════════════════════════════════════════════════════════════════════════
+%                             DOCUMENT VARIABLES
+% ═════════════════════════════════════════════════════════════════════════════
+
+% Course Information
+\newcommand{\coursecode}{MECA-H411}
+\newcommand{\coursetitle}{Structural Analysis and Finite Elements}
+
+% Document Title
+\newcommand{\doctitle}{Motorcycle Suspension Springs Analysis}
+\newcommand{\docsubtitle}{Laboratory Report}
+
+% Authors (use \\ for multiple authors)
+\newcommand{\docauthors}{%
+	Ibrahim El Mankouri \\
+	Ibrahima Sow \\
+	Maximilien Zarioh%
+}
+
+% Supervisor(s) (use \\ for multiple supervisors)
+\newcommand{\docsupervisors}{%
+	Prof. Peter Berke \\
+	Louis Remes \\
+	Noémi Mertens%
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+%                ⚠️ DO NOT MODIFY ANYTHING BELOW THIS LINE
+% ═════════════════════════════════════════════════════════════════════════════
+
+\documentclass[a4paper,12pt]{article}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                          CONDITIONAL DEFINITIONS
+% ─────────────────────────────────────────────────────────────────────────────
+
+\usepackage{ifthen}
+\usepackage{etoolbox}
+
+% Create boolean flags for each school
+\newbool{isBRUFACE}
+\newbool{isULB}
+\newbool{isUMONS}
+\newbool{isEnglish}
+\newbool{hasSceau}
+
+% Set flags based on school selection
+\ifthenelse{\equal{\school}{BRUFACE}}{%
+	\booltrue{isBRUFACE}
+	\booltrue{isEnglish}
+	\booltrue{hasSceau}
+}{}
+
+\ifthenelse{\equal{\school}{ULB}}{%
+	\booltrue{isULB}
+	\booltrue{isEnglish}
+	\booltrue{hasSceau}
+}{}
+
+\ifthenelse{\equal{\school}{UMONS}}{%
+	\booltrue{isUMONS}
+	\boolfalse{isEnglish}
+	\boolfalse{hasSceau}
+}{}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                             LANGUAGE SETTINGS
+% ─────────────────────────────────────────────────────────────────────────────
+
+\ifbool{isEnglish}{%
+	\usepackage[english]{babel}
+}{%
+	\usepackage[french]{babel}
+}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{csquotes}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                             BIBLIOGRAPHY SETUP
+% ─────────────────────────────────────────────────────────────────────────────
+
+\usepackage[backend=biber, style=ieee]{biblatex}
+\addbibresource{data/references.bib}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                                PACKAGES
+% ─────────────────────────────────────────────────────────────────────────────
+
+% Layout
+\usepackage{geometry}
+\geometry{margin=2cm}
+
+% Line spacing
+\usepackage{setspace}
+\onehalfspacing
+
+% Graphics & Colors
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[pages=some]{background}
+\usepackage{tcolorbox}
+
+% Typography - Times New Roman equivalent
+\usepackage{mathptmx}  % Times font for text and math
+\usepackage{textcomp}
+
+% Math
+\usepackage{amsmath, amssymb}
+
+% Tables & Figures
+\usepackage{booktabs}
+\usepackage{array, tabularx, float, makecell, ragged2e}
+\usepackage{subcaption}
+\usepackage{caption}
+
+% Lists
+\usepackage{enumitem}
+
+% Code Listings
+\usepackage{listings}
+
+% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=black,
+	filecolor=magenta,
+	urlcolor=blue,
+	citecolor=blue,
+	pdftitle={\doctitle},
+	pdfauthor={Maximilien Zarioh},
+}
+
+% Ensure numbering is active by default (Section down to Subsubsection)
+\setcounter{secnumdepth}{3}
+
+% PGFPlots for graphs
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% Calendar (for date calculations)
+\usepackage{pgfcalendar}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                             CUSTOM SETTINGS
+% ─────────────────────────────────────────────────────────────────────────────
+
+% Table settings
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\newcolumntype{C}{>{\Centering\arraybackslash}X}
+
+% Code listing style
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\lstdefinestyle{custom}{
+	backgroundcolor=\color{gray!10},
+	basicstyle=\ttfamily\footnotesize,
+	breaklines=true,
+	frame=single,
+	numbers=left,
+	numberstyle=\tiny,
+	keywordstyle=\color{blue},
+	commentstyle=\color{gray!70},
+	stringstyle=\color{orange},
+	tabsize=2,
+	captionpos=b
+}
+\lstset{style=custom}
+
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                         ACADEMIC YEAR CALCULATION
+% ─────────────────────────────────────────────────────────────────────────────
+
+\newcommand{\academicyear}{%
+	\ifnum\month<9
+	\number\numexpr\year-1\relax--\number\year
+	\else
+	\number\year--\number\numexpr\year+1\relax
+	\fi
+}
+
+% Language-dependent "Academic Year" label
+\ifbool{isEnglish}{%
+	\newcommand{\academicyearlabel}{Academic Year}
+}{%
+	\newcommand{\academicyearlabel}{Année académique}
+}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                           BACKGROUND SCEAU SETUP
+% ─────────────────────────────────────────────────────────────────────────────
+
+\ifbool{hasSceau}{%
+	\backgroundsetup{
+		scale=1,
+		color=black,
+		opacity=0.05,
+		angle=15,
+		position={13cm,-23cm},
+		contents={%
+			\includegraphics[height=15cm,width=15cm,keepaspectratio]{data/logos/sceau_ulb.jpg}
+		}%
+	}
+}{}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                          TITLE PAGE CONFIGURATION
+% ─────────────────────────────────────────────────────────────────────────────
+
+% School-specific logo paths
+\ifbool{isBRUFACE}{%
+	\newcommand{\logoconfig}{%
+		\begin{minipage}[c]{0.3\textwidth}
+			\raggedright
+			\includegraphics[height=1.5cm]{data/logos/logo_ulb.png}
+		\end{minipage}%
+		\hfill
+		\begin{minipage}[c]{0.3\textwidth}
+			\centering
+			\includegraphics[height=1.5cm]{data/logos/logo_bruface.png}
+		\end{minipage}%
+		\hfill
+		\begin{minipage}[c]{0.3\textwidth}
+			\raggedleft
+			\includegraphics[height=1.5cm]{data/logos/logo_vub.png}
+		\end{minipage}%
+	}
+	\newcommand{\schoolname}{Brussels Faculty of Engineering}
+	\newcommand{\facultyname}{}
+}{}
+
+\ifbool{isULB}{%
+	\newcommand{\logoconfig}{%
+		\begin{minipage}[c]{0.48\textwidth}
+			\raggedright
+			\includegraphics[height=1.8cm]{data/logos/logo_ulb.png}
+		\end{minipage}%
+		\hfill
+		\begin{minipage}[c]{0.48\textwidth}
+			\raggedleft
+			\includegraphics[height=1.8cm]{data/logos/logo_epb.png}
+		\end{minipage}%
+	}
+	\newcommand{\schoolname}{Université Libre de Bruxelles}
+	\newcommand{\facultyname}{École Polytechnique de Bruxelles}
+}{}
+
+\ifbool{isUMONS}{%
+	\newcommand{\logoconfig}{%
+		\begin{minipage}[c]{0.48\textwidth}
+			\raggedright
+			\includegraphics[height=1.8cm]{data/logos/logo_umons.png}
+		\end{minipage}%
+		\hfill
+		\begin{minipage}[c]{0.48\textwidth}
+			\raggedleft
+			\includegraphics[height=1.8cm]{data/logos/logo_fpms.png}
+		\end{minipage}%
+	}
+	\newcommand{\schoolname}{Université de Mons}
+	\newcommand{\facultyname}{Faculté Polytechnique de Mons}
+}{}
+
+% Language-dependent labels
+\ifbool{isEnglish}{%
+	\newcommand{\authorlabel}{Written by}
+	\newcommand{\supervisorlabel}{Supervised by}
+	\newcommand{\bibliographytitle}{Bibliography}
+	\newcommand{\bibarticles}{Journal Articles}
+	\newcommand{\bibbooks}{Books}
+	\newcommand{\bibbooklets}{Booklets}
+	\newcommand{\bibinbook}{Book Chapters}
+	\newcommand{\bibincollection}{Articles in a Collection}
+	\newcommand{\bibinproceedings}{Conference Proceedings}
+	\newcommand{\bibmanual}{Manuals}
+	\newcommand{\bibmastersthesis}{Master's Theses}
+	\newcommand{\bibphdthesis}{PhD Theses}
+	\newcommand{\bibproceedings}{Conference Proceedings (Book of Proceedings)}
+	\newcommand{\bibreport}{Reports}
+	\newcommand{\bibunpublished}{Unpublished Manuscripts}
+	\newcommand{\bibmisc}{Miscellaneous References}
+	\newcommand{\bibonline}{Web Pages}
+	\newcommand{\bibpatent}{Patents}
+	\newcommand{\bibstandard}{Standards}
+}{%
+	\newcommand{\authorlabel}{Rédigé par}
+	\newcommand{\supervisorlabel}{Sous la direction de}
+	\newcommand{\bibliographytitle}{Bibliographie}
+	\newcommand{\bibarticles}{Articles de revues}
+	\newcommand{\bibbooks}{Livres}
+	\newcommand{\bibbooklets}{Livrets}
+	\newcommand{\bibinbook}{Chapitres de livres}
+	\newcommand{\bibincollection}{Articles dans une collection}
+	\newcommand{\bibinproceedings}{Actes de conférences}
+	\newcommand{\bibmanual}{Manuels}
+	\newcommand{\bibmastersthesis}{Mémoires de Master}
+	\newcommand{\bibphdthesis}{Thèses de doctorat}
+	\newcommand{\bibproceedings}{Actes de conférences (livre des actes)}
+	\newcommand{\bibreport}{Rapports}
+	\newcommand{\bibunpublished}{Manuscrits non publiés}
+	\newcommand{\bibmisc}{Références diverses}
+	\newcommand{\bibonline}{Pages Web}
+	\newcommand{\bibpatent}{Brevets}
+	\newcommand{\bibstandard}{Normes}
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+%                             DOCUMENT BEGINS HERE
+% ═════════════════════════════════════════════════════════════════════════════
+
+\begin{document}
+	
+	% ─────────────────────────────────────────────────────────────────────────
+	%                              TITLE PAGE
+	% ─────────────────────────────────────────────────────────────────────────
+	
+	\begin{titlepage}
+		\ifbool{hasSceau}{\BgThispage}{}
+		
+		\begin{center}
+			% ─── LOGOS ───────────────────────────────────────────────────────
+			\logoconfig
+			\vspace{3cm}
+			
+			% ─── COURSE CODE ─────────────────────────────────────────────────
+			{\Large\textsc{\coursecode}}
+			\vspace{0.3cm}
+			
+			% ─── COURSE TITLE ────────────────────────────────────────────────
+			{\LARGE\textbf{\coursetitle}}
+			\vspace{1.5cm}
+			
+			% ─── DOCUMENT TITLE ──────────────────────────────────────────────
+			\rule{\textwidth}{1.6pt}
+			\vspace*{-\baselineskip}
+			\vspace*{-11pt}
+			\rule{\textwidth}{0.4pt}
+			\vspace{0\baselineskip}
+			
+			{\Huge\bfseries\doctitle}
+			
+			\vspace{\baselineskip}
+			{\Large\textit{\docsubtitle}}
+			
+			\vspace{0\baselineskip}
+			\rule{\textwidth}{0.4pt}
+			\vspace*{-\baselineskip}
+			\vspace{-10pt}
+			\rule{\textwidth}{1.6pt}
+			\vspace{1.5cm}
+			
+			% ─── AUTHORS AND SUPERVISORS ─────────────────────────────────────
+			\begin{minipage}[t]{0.45\textwidth}
+				\begin{flushleft}
+					\large
+					\textbf{\authorlabel}\\[0.3cm]
+					\docauthors
+				\end{flushleft}
+			\end{minipage}%
+			\hfill
+			\begin{minipage}[t]{0.45\textwidth}
+				\begin{flushright}
+					\large
+					\textbf{\supervisorlabel}\\[0.3cm]
+					\docsupervisors
+				\end{flushright}
+			\end{minipage}
+			
+			\vfill
+			
+			% ─── ACADEMIC YEAR ───────────────────────────────────────────────
+			{\large\textsc{\academicyearlabel{} \academicyear}}
+			
+		\end{center}
+	\end{titlepage}
+	
+	% ─────────────────────────────────────────────────────────────────────────
+	%                          TABLE OF CONTENTS
+	% ─────────────────────────────────────────────────────────────────────────
+	
+	\pagenumbering{gobble}
+	\tableofcontents
+	\newpage
+	
+	% ─────────────────────────────────────────────────────────────────────────
+	%                               CONTENT
+	% ─────────────────────────────────────────────────────────────────────────
+	
+	\pagenumbering{arabic}
+	
+	\input{content/content.tex}
+	
+\end{document}

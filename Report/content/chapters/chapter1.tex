@@ -1,0 +1,36 @@
+\section{Model setup}
+\label{chap:model_setup}
+
+This chapter details the numerical models developed for this study. We began with a preliminary convergence study on a plate with a hole to validate our mesh refinement strategy, before modeling the Kawasaki ZR-7 suspension springs. All geometries and meshes were generated using Salome-Meca.
+
+\subsection{Preliminary study: plate with a hole}
+\label{sec:plate_model}
+
+To understand the influence of mesh density on solution accuracy, we first analyzed a classic stress concentration problem: a thin rectangular plate with a central circular hole subjected to uniform traction.
+
+\subsubsection{Geometry and boundary conditions}
+The plate has a length $L = 520$ mm, a half-height $h = 180$ mm (total height $H=360$ mm), and a thickness $t = 2$ mm. A central hole of radius $R = 3.2$ mm is located at the geometric center. The material is linear elastic steel with Young's modulus $E = 210$ GPa and Poisson's ratio $\nu = 0.3$.
+
+The loading consists of a uniform surface traction $T_x = 81$ N/mm$^2$ applied to the left and right edges. Appropriate constraints were applied to prevent rigid body motion while allowing Poisson contraction.
+
+\subsubsection{Mesh strategy}
+Four tetrahedral meshes were generated with increasing density: "Coarse", "Moderate", "Fine", and "Very Fine". The refinement focused on the region around the hole where high stress gradients were expected.
+
+\subsection{Kawasaki ZR-7 front spring}
+\label{sec:front_spring_model}
+
+The front suspension spring of the Kawasaki ZR-7 is a helical compression spring. Due to the high computational cost of meshing the full geometry, we investigated simplified models using reduced numbers of coils.
+
+\subsubsection{Geometry and material}
+The spring is defined by a free length $L_0 = 416$ mm, an outer diameter $D_{ext} = 34$ mm, a wire diameter $d = 4.7$ mm, and a total of $n = 26$ coils (with 24 active coils). The geometry was generated using a parametric Python script \cite{helix_salome}. The material properties are identical to those of the plate ($E=210$ GPa, $\nu=0.3$).
+
+\subsubsection{Finite element models}
+Three distinct geometric models were created to test the validity of simplifying the spring domain. A 1-coil model was used to simulate an infinite spring with periodic-like conditions. A 2-coil model helped introduce interactions between coils, while a 3-coil model provided a closer approximation to the boundary effects found in the actual component.
+
+\subsubsection{Boundary conditions}
+The simulation mimics a compression test. The bottom surface was fully fixed ($u_x = u_y = u_z = 0$), while an imposed vertical displacement $\delta_z = -1$ mm was applied to the top surface. Horizontal degrees of freedom at the top were fixed ($u_x = u_y = 0$) to simulate flat parallel plates. The spring stiffness $k$ was computed as the total reaction force in the Z-direction divided by the applied displacement ($k = F_z / \delta_z$). The results from these reduced models were extrapolated to the full 24-active-coil spring using series spring theory.
+
+\subsection{Rear spring model}
+\label{sec:rear_spring_model}
+
+The rear spring is significantly stiffer and larger. Its dimensions ($D_{ext} = 80$ mm, $d=11$ mm, $L_0 = 195$ mm, $n=6$) were measured experimentally. A single geometric model representing a 3-coil section was used with boundary conditions identical to the front spring. Four mesh densities were tested to ensure convergence.

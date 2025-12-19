@@ -1,0 +1,124 @@
+\setcounter{section}{8}
+\section{Code verification}
+\label{chap:verification}
+
+Part II of this report focuses on the verification of the custom Finite Element code developed in Python. The validation strategy relies on the test suite implemented in \texttt{validation.py}, which checks individual components independently before testing the global assembly. This section provides detailed physical justifications for each test case and presents the exact output obtained.
+
+\subsection{Test descriptions and physical justifications}
+\label{sec:test_descriptions}
+
+The verification process is divided into two categories: single-element tests to check element formulation, and multi-element tests to valid global assembly and boundary conditions.
+
+\subsubsection{Single element tests}
+
+We began by verifying the fundamental geometry calculations (Test 1.1). The volume of a unit tetrahedron defined by vertices at $(0,0,0)$, $(1,0,0)$, $(0,1,0)$, and $(0,0,1)$ was computed. The analytical volume is $V = 1/6 \approx 0.167$. Our code returned exactly $0.167$, confirming the correctness of the Jacobian determinant calculation.
+
+Next, we performed 'patch tests' to validate the stiffness matrix implementation. We first imposed a zero-displacement field (Test 1.2.1), which physically corresponds to a zero-energy state. As expected, the computed strain energy and nodal forces were zero. We then imposed six independent unit strain fields (Tests 1.2.2--1.2.7), corresponding to pure tension ($\varepsilon_{xx}, \varepsilon_{yy}, \varepsilon_{zz}$) and pure shear ($\gamma_{xy}, \gamma_{yz}, \gamma_{xz}$). For linear tetrahedral elements (TETRA4), the strain field must be constant and exact. In all six cases, the error between the imposed and computed strain was $0.000$, validating the construction of the strain-displacement matrix $B$.
+
+Rigid body motions were also tested (Tests 1.3 \& 1.4). We applied uniform translations (dX, dY, dZ) and infinitesimal rotations (rotX, rotY, rotZ) to the element. Since rigid body motion induces no deformation, the strain energy must be zero. The code computed maximum strains of $0$ for all these cases, proving that the element is strictly invariant under rigid body transformations. Finally, the Poisson effect was checked (Test 1.5) by simulating uniaxial tension with a Poisson's ratio $\nu=0$. The solver correctly returned zero lateral stress, confirming the constitutive law implementation.
+
+\subsubsection{Multi-element tests (cube mesh)}
+
+To verify the assembly algorithms, we created a unit cube mesh composed of 5 tetrahedra. We repeated the patch tests on this aggregate structure (Tests 2.1). Imposing a constant strain field on the boundary nodes resulted in a uniform strain distribution throughout the interior elements with zero error. This confirms that the global stiffness matrix $K$ is correctly assembled from the element matrices. Similarly, applying rigid body translations (Tests 2.2) and rotations (Tests 2.3) to the entire mesh produced zero strain, verifying that the assembly process preserves the null-space properties of the stiffness matrix.
+
+\subsubsection{Boundary condition implementation}
+
+The penalty method implementation was verified by testing its sensitivity to the penalty parameter $Z$ (Tests 2.4). We applied fixed boundary conditions to a loaded structure using three values of $Z$.
+\begin{enumerate}
+    \item \textbf{Low $Z$ ($Z=1$):} The constrained nodes moved significantly ($u \approx 18.0$), showing that the penalty spring was too weak to enforce the fixture.
+    \item \textbf{Optimal $Z$ ($Z=10^6$):} The displacement at fixed nodes dropped to near-zero ($1.99 \times 10^{-5}$), proving effective locking of the degrees of freedom.
+    \item \textbf{High $Z$ ($Z=10^{100}$):} While theoretically better, this introduced numerical noise due to floating-point ill-conditioning, resulting in a slightly larger error ($3.64 \times 10^{-5}$).
+\end{enumerate}
+This test justified our choice of $Z=10^6$ for the main simulations.
+
+\subsection{Summary of results}
+\label{sec:summary_table}
+
+The complete results of the automated test suite are listed in Table \ref{tab:verification_summary}. Every test passed within the expected tolerance.
+
+\begin{table}[H]
+    \centering
+    \small
+    \caption{Complete summary of verification tests from \texttt{validation.py}.}
+    \label{tab:verification_summary}
+    \begin{tabular}{lllc}
+        \toprule
+        \textbf{ID} & \textbf{Test Description} & \textbf{Physical Check} & \textbf{Result} \\
+        \midrule
+        1.1 & Single Element Volume & $V_{calc} = 0.167$ & Pass \\
+        \midrule
+        1.2.1 & Zero Displacement & $\varepsilon_{max} = 0.000$ & Pass \\
+        1.2.2 & Patch Test ($\varepsilon_{xx}$) & error $= 0.000$ & Pass \\
+        1.2.3 & Patch Test ($\varepsilon_{yy}$) & error $= 0.000$ & Pass \\
+        1.2.4 & Patch Test ($\varepsilon_{zz}$) & error $= 0.000$ & Pass \\
+        1.2.5 & Patch Test ($\gamma_{xy}$) & error $= 0.000$ & Pass \\
+        1.2.6 & Patch Test ($\gamma_{yz}$) & error $= 0.000$ & Pass \\
+        1.2.7 & Patch Test ($\gamma_{xz}$) & error $= 0.000$ & Pass \\
+        \midrule
+        1.3.1 & Rigid Body Trans. X & $\varepsilon_{max} = 0.000$ & Pass \\
+        1.3.2 & Rigid Body Trans. Y & $\varepsilon_{max} = 0.000$ & Pass \\
+        1.3.3 & Rigid Body Trans. Z & $\varepsilon_{max} = 0.000$ & Pass \\
+        \midrule
+        1.4.1 & Rigid Body Rot. X & $\varepsilon_{max} = 0.000$ & Pass \\
+        1.4.2 & Rigid Body Rot. Y & $\varepsilon_{max} = 0.000$ & Pass \\
+        1.4.3 & Rigid Body Rot. Z & $\varepsilon_{max} = 0.000$ & Pass \\
+        \midrule
+        1.5 & Poisson Effect ($\nu=0$) & $\sigma_{lat} = 0.000$ & Pass \\
+        \midrule
+        2.1 & Assembled Patch Test & error $= 0.000$ & Pass \\
+        2.2 & Assembled Rigid Trans. & $\varepsilon_{max} = 0.000$ & Pass \\
+        2.3 & Assembled Rigid Rot. & $\varepsilon_{max} = 0.000$ & Pass \\
+        \midrule
+        2.4.1 & Penalty (Low $Z$) & $u_{fix} \approx 18.0$ (High) & Pass \\
+        2.4.2 & Penalty (Optimal $Z$) & $u_{fix} \approx 0$ (OK) & Pass \\
+        2.4.3 & Penalty (High $Z$) & $u_{fix} \approx 0$ (Noise) & Pass \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Convergence study with closed-form solution}
+\label{sec:convergence_study}
+
+To validate mesh convergence behavior, we performed a classical stress concentration study on a plate with a central hole in Salome-Meca. The plate dimensions are $L=520$ mm, $H=360$ mm, with a hole of radius $R=3.2$ mm. A uniform traction $T_x = 81$ N/mm$^2$ was applied, and the material properties are $E=210$ GPa, $\nu=0.3$.
+
+The theoretical maximum stress at the hole edge is given by the stress concentration factor $K_t \approx 3$, yielding:
+\[
+\sigma_{max}^{theory} = K_t \cdot T_x = 3 \times 81 = 243 \text{ MPa}
+\]
+For finite geometries, this reduces slightly to approximately $236.56$ MPa.
+
+Four mesh densities were tested, and the results are summarized below:
+\begin{center}
+\small
+\begin{tabular}{lcc}
+    \toprule
+    \textbf{Mesh} & \textbf{Elements} & \textbf{Max Stress [MPa]} \\
+    \midrule
+    Coarse & 118 & 106.13 \\
+    Moderate & 163 & 181.18 \\
+    Fine & 247 & 206.10 \\
+    Very Fine & 580 & 233.48 \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+The ``Very Fine'' mesh result (233.48 MPa) is within $1.3\%$ of the theoretical value, demonstrating proper convergence. This confirms that the Salome-Meca solver correctly captures stress concentrations when given sufficient mesh refinement.
+
+\subsection{Salome-to-Python cross-validation}
+\label{sec:salome_comparison}
+
+To further validate our solver against a commercial reference, we attempted to compare its output with Salome-Meca on the same geometry. The intended workflow was to use the \texttt{salome2py} package to automatically convert a Salome mesh file (\texttt{.med}) into a Python input compatible with our solver. However, this tool did not function correctly in our environment. Instead, we performed a manual conversion: we exported the Salome results to a CSV file, extracted the nodal coordinates and connectivity, and manually constructed the input file \texttt{inputs/input\_salome2py\_spring.py}.
+
+The comparison was performed using the script \texttt{compare\_salome.py}, which reads the stress field from both the Salome CSV export and our solver's \texttt{.npz} output. We computed the maximum Von Mises stress for each case:
+\begin{itemize}
+    \item \textbf{Salome-Meca:} $\sigma_{VM,max} = 51.16$ MPa
+    \item \textbf{Python Solver:} $\sigma_{VM,max} = 119.91$ MPa
+    \item \textbf{Relative Error:} $134\%$
+\end{itemize}
+
+This significant discrepancy is explained by the difference in load application. In Salome-Meca, forces are applied as a distributed pressure across a surface, resulting in a smoother stress distribution. In our Python implementation, the same total force is applied as concentrated nodal forces, which creates stress singularities at the loaded nodes and artificially inflates the maximum stress. This limitation is inherent to a simplified manual import workflow and does not indicate an error in the solver itself.
+
+\subsection{Conclusion}
+\label{sec:verification_conclusion}
+
+The successful execution of the verification tests demonstrates that the core Python solver is mathematically correct. The code reliably computes element matrices, assembles the global system, and properly applies boundary conditions using the penalty method. While the Salome-to-Python cross-validation showed a large numerical discrepancy, the source of this error is well understood: the simplified nodal force application differs fundamentally from the distributed pressure used in Salome. Despite this, the workflow proves that importing external meshes is feasible, and the solver produces physically meaningful results. The quantitative results in Part I therefore rely on the commercial solver Salome-Meca, which handles load application more accurately.

@@ -1,0 +1,12 @@
+\section{Conclusion}
+\label{chap:conclusion}
+
+This project successfully demonstrated the complete finite element analysis workflow for a motorcycle suspension spring, from CAD geometry generation to the validation of a custom solver code.
+
+\subsection{Summary of achievements}
+
+We developed proficiency in the Salome-Meca platform by executing both a preliminary plate analysis and a complex spring study. Three successive spring models (1, 2, and 3 coils) were created with increasing mesh density, and the convergence study confirmed the mesh independence of the reaction force. By modeling a 3-coil section, we were able to approximate the full spring behavior while maintaining computational efficiency. The numerical stiffness was then compared against physical measurements, allowing us to attribute discrepancies to specific factors like element formulation and geometric simplifications. Finally, a rigorous suite of verification tests confirmed the correctness of our custom FEM implementation, validating our element formulation, assembly, and boundary condition algorithms.
+
+\subsection{Key learnings}
+
+A critical takeaway from this project is that element selection matters significantly; linear tetrahedra exhibit stiffness issues in bending-dominated problems, necessitating higher-order elements for accuracy. Furthermore, we reinforced the distinction between verification and validation: while patch tests ensure mathematical correctness, validation against experimental data is essential to assess physical accuracy. Most importantly, we observed that convergence is necessary but not sufficient, as a converged FEM solution only guarantees control over discretization error, not agreement with physical reality.

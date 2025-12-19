@@ -4,7 +4,7 @@ import sys
 import shutil
 from provided_code.solver import linel_fem_solver
 
-INPUT_DIR = "inputs"
+INPUT_DIR = ""
 OUTPUT_DIR = "outputs"
 
 def ensure_dir(path):
